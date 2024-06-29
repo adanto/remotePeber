@@ -1,6 +1,9 @@
-﻿
+cmake_minimum_required (VERSION 3.8)
+
+project("remotePeber")
+
 add_executable (remotePeber "remotePeber.cpp" "remotePeber.h")
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET remotePeber PROPERTY CXX_STANDARD 20)
-endif()
+target_link_libraries(${PROJECT_NAME}
+    sub::lib2
+)

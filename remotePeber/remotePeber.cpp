@@ -2,14 +2,13 @@
 
 int LoadNtQueryAndGetPEB(HANDLE hProcess);
 int IterateOverProcesses();
-void debugPrintPEBInfo(MY_PPEB pPEB, WCHAR* ImagePathNameBuffer, WCHAR* CommandLineBuffer);
+void debugPrintPEBInfo(PPEB pPEB, WCHAR* ImagePathNameBuffer, WCHAR* CommandLineBuffer);
 
 int main()
 {
 	IterateOverProcesses();
 	return 0;
 }
-
 
 int IterateOverProcesses() {
 
@@ -41,6 +40,8 @@ int IterateOverProcesses() {
 	}
 
 	CloseHandle(hSnapshot);
+
+	return 1;
 }
 
 // Load NtQueryInformationProcess function and get PEB information for the given process
@@ -78,12 +79,12 @@ int LoadNtQueryAndGetPEB(HANDLE hProcess)
 	SIZE_T bytesRead = 0;
 
 	// Read the PEB structure from the target process
-	if (!ReadProcessMemory(hProcess, pbi.PebBaseAddress, PEBbuffer, sizeof(MY_PEB), &bytesRead)) {
+	if (!ReadProcessMemory(hProcess, pbi.PebBaseAddress, PEBbuffer, sizeof(PEB), &bytesRead)) {
 		fprintf(stderr, "\n\t[!] Could not read PEB base\n");
 		return -1;
 	}
 
-	MY_PPEB pPEB = reinterpret_cast<MY_PPEB>(PEBbuffer);
+	PPEB pPEB = reinterpret_cast<PPEB>(PEBbuffer);
 
 	// Buffer to read the process parameters structure
 	LPVOID bufferPParams[sizeof(RTL_USER_PROCESS_PARAMETERS)];
@@ -126,7 +127,7 @@ if (!ReadProcessMemory(hProcess, (LPCVOID)(pPEB->ProcessParameters), bufferPPara
 	
 }
 
-void debugPrintPEBInfo(MY_PPEB pPEB, WCHAR* ImagePathNameBuffer, WCHAR* CommandLineBuffer)
+void debugPrintPEBInfo(PPEB pPEB, WCHAR* ImagePathNameBuffer, WCHAR* CommandLineBuffer)
 {
 	wprintf(L"\n%20s: %s", L"CommandLine", CommandLineBuffer);
 	wprintf(L"\n%20s: %s", L"ImagePathName", ImagePathNameBuffer);
